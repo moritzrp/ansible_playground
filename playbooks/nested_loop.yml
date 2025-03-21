@@ -1,0 +1,30 @@
+---
+- name: Nested loop example
+  hosts: localhost
+  gather_facts: false
+  vars:
+    machines:
+      server_1:
+        hostname: "Server-1"
+        network_adapters:
+          - name: LAN1
+            ip_address: "10.0.0.10"
+          - name: LAN2
+            ip_address: "10.99.99.20"
+      client_1:
+        hostname: "Client-1"
+        network_adapters:
+          - name: LAN2
+            ip_address: "10.99.99.30"
+      client_2:
+        hostname: "Client-2"
+        network_adapters:
+          - name: LAN2
+            ip_address: "10.99.99.31"
+  tasks:
+    - name: List all machines and their interface information
+      ansible.builtin.debug:
+        msg: "Host={{ item.0.hostname }} Interface={{ item.1.name }} IP={{ item.1.ip_address }}"
+      with_subelements:
+        - "{{ machines }}"
+        - network_adapters
