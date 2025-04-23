@@ -1,0 +1,24 @@
+hosts:
+  - hostname: hyperhyper
+    ansible_host: localhost
+    ansible_port: 2222
+    cpus: 12
+    memory: 32
+    roles:
+      - hypervisor
+
+  - hostname: ad01
+    ansible_host: localhost
+    ansible_port: 2223
+    cpus: 4
+    memory: 8
+    roles:
+      - ad_dc
+
+  - hostname: cl01
+    ansible_host: localhost
+    ansible_port: 2224
+    cpus: 4
+    memory: 4
+    roles:
+      - client

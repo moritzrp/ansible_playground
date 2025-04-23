@@ -1,0 +1,19 @@
+services:
+  hyperhyper:
+    image: ubuntu-ansible
+    build: ../../containers/ubuntu
+    container_name: hyperhyper
+    ports:
+      - "2222:22"
+  ad01:
+    image: ubuntu-ansible
+    build: ../../containers/ubuntu
+    container_name: ad01
+    ports:
+      - "2223:22"
+  cl01:
+    image: ubuntu-ansible
+    build: ../../containers/ubuntu
+    container_name: cl01
+    ports:
+      - "2224:22"

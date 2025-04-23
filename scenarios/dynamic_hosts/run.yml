@@ -1,0 +1,55 @@
+---
+- name: Fetch inventory
+  hosts: localhost
+  gather_facts: false
+  pre_tasks:
+    - name: Load variables
+      ansible.builtin.include_vars:
+        file: response.yml
+    - name: Add host
+      ansible.builtin.add_host:
+        name: "{{ item.hostname }}"
+        ansible_host: "{{ item.ansible_host }}"
+        ansible_port: "{{ item.ansible_port }}"
+        ansible_user: ansible
+        ansible_password: ansible
+        cpus: "{{ item.cpus }}"
+        memory: "{{ item.memory }}"
+        groups: "{{ item.roles }}"
+      loop: "{{ hosts }}"
+
+- name: Setup Hypervisor
+  hosts: hypervisor
+  gather_facts: false
+  tasks:
+    - name: Print Hello World
+      ansible.builtin.debug:
+        msg: "{{ ansible_port }}"
+    - name: Test command
+      ansible.builtin.command:
+        cmd: echo "Hello from hypervisor"
+      changed_when: false
+
+- name: Setup Active Directory
+  hosts: ad_dc
+  gather_facts: false
+  tasks:
+    - name: Print Hello World
+      ansible.builtin.debug:
+        msg: "{{ ansible_port }}"
+    - name: Test command
+      ansible.builtin.command:
+        cmd: echo "Hello from Active Directory"
+      changed_when: false
+
+- name: Setup Client
+  hosts: client
+  gather_facts: false
+  tasks:
+    - name: Print Hello World
+      ansible.builtin.debug:
+        msg: "{{ ansible_port }}"
+    - name: Test command
+      ansible.builtin.command:
+        cmd: echo "Hello from Client"
+      changed_when: false
