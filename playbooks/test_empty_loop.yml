@@ -1,0 +1,9 @@
+---
+- name: Add each switch to all hosts
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Add switch to host
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      loop: "{{ hosts | default([]) }}"
