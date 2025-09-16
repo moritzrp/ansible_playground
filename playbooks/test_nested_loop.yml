@@ -1,5 +1,5 @@
 ---
-- name: Nested loop example
+- name: Nested as dictionary
   hosts: localhost
   gather_facts: false
   vars:
@@ -24,12 +24,15 @@
   tasks:
     - name: List all machines and their interface information
       ansible.builtin.debug:
-        msg: "Host={{ item.0.hostname }} Interface={{ item.1.name }} IP={{ item.1.ip_address }}"
-      with_subelements:
-        - "{{ machines }}"
-        - network_adapters
+        msg: "Host={{ server.hostname }} Interface={{ adapter.name }} IP={{ adapter.ip_address }}"
+      loop: "{{ machines | subelements('network_adapters') }}"
+      loop_control:
+        label: "{{ server.hostname }}: {{ adapter.name }}"
+      vars:
+        server: "{{ item.0 }}"
+        adapter: "{{ item.1 }}"
 
-- name: Alternative nested loop example
+- name: Nested as list
   hosts: localhost
   gather_facts: false
   vars:
@@ -51,7 +54,10 @@
   tasks:
     - name: List all machines and their interface information
       ansible.builtin.debug:
-        msg: "Host={{ item.0.hostname }} Interface={{ item.1.name }} IP={{ item.1.ip_address }}"
-      with_subelements:
-        - "{{ machines }}"
-        - network_adapters
+        msg: "Host={{ server.hostname }} Interface={{ adapter.name }} IP={{ adapter.ip_address }}"
+      loop: "{{ machines | subelements('network_adapters') }}"
+      loop_control:
+        label: "{{ server.hostname }}: {{ adapter.name }}"
+      vars:
+        server: "{{ item.0 }}"
+        adapter: "{{ item.1 }}"
