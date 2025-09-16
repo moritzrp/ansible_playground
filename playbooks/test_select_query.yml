@@ -1,0 +1,65 @@
+---
+- name: Alternative nested loop example
+  hosts: localhost
+  gather_facts: false
+  vars:
+    machines:
+      - hostname: "Server-1"
+        network_adapters:
+          - name: LAN1
+            ip_address: "10.0.0.10"
+          - name: LAN2
+            ip_address: "10.99.99.20"
+        disks:
+          - name: Data
+            letter: D
+            size: "40"
+      - hostname: "Client-1"
+        network_adapters:
+          - name: LAN2
+            ip_address: "10.99.99.30"
+      - hostname: "Client-2"
+        network_adapters:
+          - name: LAN2
+            ip_address: "10.99.99.31"
+  tasks:
+    - name: Register wanted variables via selectattr
+      ansible.builtin.set_fact:
+        wanted_host_select: "{{ machines | selectattr('hostname', '==', 'Server-1') | first }}"
+
+    - name: Show selected host
+      ansible.builtin.debug:
+        var: wanted_host_select
+
+    - name: Show selected network_adapters
+      ansible.builtin.debug:
+        msg: "{{ wanted_host_select.network_adapters }}"
+
+    - name: Debug disks
+      ansible.builtin.debug:
+        msg: "{{ wanted_host_select.disks | type_debug }}"
+
+    - name: Loop disks
+      ansible.builtin.debug:
+        var: item.name
+      loop: "{{ wanted_host_select.disks | default([]) }}"
+
+    - name: Register wanted variables via query
+      ansible.builtin.set_fact:
+        wanted_host_query: "{{ machines | community.general.json_query(select_query) }}"
+      vars:
+        select_query: "[?hostname=='Client-2']"
+
+    - name: Register wanted network adapters via query
+      ansible.builtin.set_fact:
+        wanted_nic_query: "{{ machines | community.general.json_query(select_query) }}"
+      vars:
+        select_query: "[?hostname=='Client-2'].network_adapters"
+
+    - name: Show queried host
+      ansible.builtin.debug:
+        var: wanted_host_query
+
+    - name: Show queried nics
+      ansible.builtin.debug:
+        var: wanted_nic_query
