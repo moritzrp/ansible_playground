@@ -1,2 +1,5 @@
 .ansible
 .vscode
+dev
+.venv
+venv
