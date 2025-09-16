@@ -1,0 +1,19 @@
+---
+- name: Test slicing of lists
+  hosts: localhost
+  gather_facts: false
+  vars:
+    fruits:
+      - apple (1)
+      - banana (2)
+      - orange (3)
+  tasks:
+    - name: Loop all items except the first
+      ansible.builtin.debug:
+        var: item
+      loop: "{{ fruits[1:] }}"
+
+    - name: Loop all items except the last
+      ansible.builtin.debug:
+        var: item
+      loop: "{{ fruits[:-1] }}"
