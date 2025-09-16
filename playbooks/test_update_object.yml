@@ -1,0 +1,33 @@
+---
+- name: Update object with additional properties and remove unnecessary properties
+  hosts: localhost
+  gather_facts: false
+  vars:
+    object:
+      disks:
+        - name: "Disk 1"
+          letter: "C"
+          size_gb: 10
+        - name: "Disk 2"
+          letter: "D"
+          size_gb: 20
+
+  tasks:
+    - name: Add default properties
+      set_fact:
+        vmware_disks: "{{ object.disks | map('combine', {'type': type, 'datastore': datastore}) }}"
+      vars:
+        type: "eagerzeroedthick"
+        datastore: "DS01"
+
+    - name: Remove unnecessary properties from disks
+      set_fact:
+        vmware_disks: "{{ vmware_disks | map('dict2items') | map('rejectattr', 'key', 'in', unnecessary_properties) | map('items2dict') | list }}"
+      vars:
+        unnecessary_properties:
+          - name
+          - letter
+
+    - name: Display updated list
+      debug:
+        var: vmware_disks
