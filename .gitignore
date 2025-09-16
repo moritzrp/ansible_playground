@@ -3,3 +3,4 @@
 dev
 .venv
 venv
+__pycache__
