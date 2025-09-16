@@ -1,0 +1,55 @@
+---
+- name: Test nested loop
+  hosts: localhost
+  gather_facts: false
+  vars:
+    vms:
+      - host1
+      - host2
+    switches:
+      - switch1
+      - switch2
+      - switch3
+  tasks:
+    - name: Add each switch to all hosts
+      ansible.builtin.debug:
+        msg: "adding host {{ vm }} to switch {{ switch }}"
+      with_nested:
+        - "{{ vms }}"
+        - "{{ switches }}"
+      vars:
+        vm: "{{ item[0] }}"
+        switch: "{{ item[1] }}"
+
+- name: Add each switch to all hypervisors
+  hosts: localhost
+  gather_facts: false
+  vars:
+    vcenter:
+      hypervisors:
+        - hostname: hypervisorA
+        - hostname: hypervisorB
+      vSwitchMapping:
+        - switch: LAN A
+          vmnics:
+            - vmnic4
+            - vmnic14
+        - switch: LAN B
+          vmnics:
+            - vmnic5
+            - vmnic15
+        - switch: LAN C
+          vmnics:
+            - vmnic6
+  tasks:
+    - name: Add switches to hypervisors
+      ansible.builtin.debug:
+        msg: "adding switch {{ switchMapping.switch }} with nics {{ switchMapping.vmnics }} to host {{ hypervisor.hostname }}"
+      with_nested:
+        - "{{ vcenter.hypervisors }}"
+        - "{{ vcenter.vSwitchMapping }}"
+      loop_control:
+        label: "{{ hypervisor }} ({{ switchMapping.switch }})"
+      vars:
+        hypervisor: "{{ item[0] }}"
+        switchMapping: "{{ item[1] }}"
