@@ -1,0 +1,20 @@
+---
+- name: Test intersect filter
+  hosts: localhost
+  gather_facts: false
+  vars:
+    users:
+      - username: Fred
+        groups:
+          - admins
+      - username: George
+        groups:
+          - users
+  tasks:
+    - name: Process admins
+      ansible.builtin.debug:
+        msg: "We have an admin named {{ item.username }}"
+      when: item.groups | intersect(["admins"]) | length > 0
+      loop: "{{ users }}"
+      loop_control:
+        label: "{{ item.username }}"
